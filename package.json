@@ -5,6 +5,7 @@
 	"main": "./src/index.js",
 	"type": "module",
 	"scripts": {
+		"prebuild": "node ./clean-dist.js",
 		"build": "tsc",
 		"postbuild": "cpy README.md dist",
 		"check-code-style": "prettier . --check"
