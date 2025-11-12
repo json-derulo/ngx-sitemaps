@@ -31,13 +31,17 @@ export async function generateSitemap(baseUrl: string, { project }: SitemapOptio
 		process.exit(1);
 	}
 
+	const lastModified = new Date().toISOString().split("T")[0];
+
 	const prerenderedRoutesPath = path.join(process.cwd(), "dist", project, "prerendered-routes.json");
 	const { routes } = JSON.parse(await fs.readFile(prerenderedRoutesPath, "utf-8"));
 	const root = create({ version: "1.0", encoding: "UTF-8" });
 	const urls = root.ele("urlset").att("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
 	for (const path in routes) {
 		const url = baseUrl + (path.endsWith("/") ? path : path + "/");
-		urls.ele("url").ele("loc").txt(url).up();
+		const urlElement = urls.ele("url");
+		urlElement.ele("loc").txt(url);
+		urlElement.ele("lastmod").txt(lastModified);
 	}
 	const xml = root.end({ prettyPrint: true });
 	const outputPath = path.join(process.cwd(), "dist", project, "browser", "sitemap.xml");
