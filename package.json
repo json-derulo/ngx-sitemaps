@@ -1,6 +1,6 @@
 {
 	"name": "ngx-sitemaps",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Generate sitemaps from Angular prerendered routes",
 	"main": "./src/index.js",
 	"type": "module",
@@ -31,14 +31,17 @@
 	"bugs": "https://github.com/json-derulo/ngx-sitemaps/issues",
 	"funding": "https://github.com/sponsors/json-derulo",
 	"dependencies": {
-		"commander": "^14.0.0",
-		"xmlbuilder2": "^3.1.1"
+		"commander": "^14.0.2",
+		"xmlbuilder2": "^4.0.0"
 	},
 	"devDependencies": {
-		"@types/node": "^22.15.24",
-		"cpy-cli": "^5.0.0",
-		"prettier": "^3.5.3",
-		"typescript": "^5.8.3"
+		"@types/node": "^24.10.1",
+		"cpy-cli": "^6.0.0",
+		"prettier": "^3.6.2",
+		"typescript": "~5.9.3"
 	},
-	"packageManager": "pnpm@10.11.0"
+	"engines": {
+		"node": ">=20"
+	},
+	"packageManager": "pnpm@10.22.0"
 }
