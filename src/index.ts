@@ -31,7 +31,7 @@ export async function generateSitemap(baseUrl: string, { project }: SitemapOptio
 		process.exit(1);
 	}
 
-	const lastModified = new Date().toISOString().split("T")[0];
+	const lastModified = getCurrentDate();
 
 	const prerenderedRoutesPath = path.join(process.cwd(), "dist", project, "prerendered-routes.json");
 	const { routes } = JSON.parse(await fs.readFile(prerenderedRoutesPath, "utf-8"));
@@ -47,4 +47,9 @@ export async function generateSitemap(baseUrl: string, { project }: SitemapOptio
 	const outputPath = path.join(process.cwd(), "dist", project, "browser", "sitemap.xml");
 
 	await fs.writeFile(outputPath, xml);
+}
+
+function getCurrentDate(): string {
+	// en-CA uses the YYYY-MM-DD format which the sitemap expects
+	return new Intl.DateTimeFormat("en-CA").format(new Date());
 }
