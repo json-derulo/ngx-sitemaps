@@ -40,6 +40,7 @@ await generateSitemap("https://your-site.com");
 
 ## Options
 
-| Title   | CLI usage   | Direct usage | Description                  |
-| ------- | ----------- | ------------ | ---------------------------- |
-| Project | `--project` | `project`    | Project name in angular.json |
+| Title          | CLI usage          | Direct usage    | Description                        |
+| -------------- | ------------------ | --------------- | ---------------------------------- |
+| Project        | `--project`        | `project`       | Project name in angular.json       |
+| Trailing Slash | `--trailing-slash` | `trailingSlash` | Adds a trailing slash to all paths |

@@ -1,6 +1,6 @@
 {
 	"name": "ngx-sitemaps",
-	"version": "0.2.1",
+	"version": "0.3.0",
 	"description": "Generate sitemaps from Angular prerendered routes",
 	"main": "./src/index.js",
 	"type": "module",

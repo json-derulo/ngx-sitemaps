@@ -9,6 +9,8 @@ export interface SitemapOptions {
 	 * If not specified, the first project will be used.
 	 */
 	project?: string;
+	/** Enabling this flag adds a trailing slash to all paths */
+	trailingSlash?: boolean;
 }
 
 /**
@@ -18,8 +20,9 @@ export interface SitemapOptions {
  *
  * @param baseUrl Absolute base URL of the site
  * @param project Project name in angular.json
+ * @param trailingSlash Ensure all URLs end with a trailing slash
  */
-export async function generateSitemap(baseUrl: string, { project }: SitemapOptions = {}) {
+export async function generateSitemap(baseUrl: string, { project, trailingSlash }: SitemapOptions = {}) {
 	if (!project) {
 		const configLocation = path.join(process.cwd(), "angular.json");
 		const config = JSON.parse(await fs.readFile(configLocation, "utf-8"));
@@ -38,7 +41,7 @@ export async function generateSitemap(baseUrl: string, { project }: SitemapOptio
 	const root = create({ version: "1.0", encoding: "UTF-8" });
 	const urls = root.ele("urlset").att("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
 	for (const path in routes) {
-		const url = baseUrl + (path.endsWith("/") ? path : path + "/");
+		const url = handleTrailingSlash(baseUrl + path, trailingSlash);
 		const urlElement = urls.ele("url");
 		urlElement.ele("loc").txt(url);
 		urlElement.ele("lastmod").txt(lastModified);
@@ -52,4 +55,11 @@ export async function generateSitemap(baseUrl: string, { project }: SitemapOptio
 function getCurrentDate(): string {
 	// en-CA uses the YYYY-MM-DD format which the sitemap expects
 	return new Intl.DateTimeFormat("en-CA").format(new Date());
+}
+
+function handleTrailingSlash(url: string, hasTrailingSlash: boolean | undefined): string {
+	if (!hasTrailingSlash || url.endsWith("/")) {
+		return url;
+	}
+	return url + "/";
 }

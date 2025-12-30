@@ -12,6 +12,7 @@ program
 	.version(version)
 	.argument("<base-url>", "Absolute base URL of the site")
 	.option("-p, --project <project>", "Project name in angular.json")
+	.option("--trailing-slash", "With this option a trailing slash is added to all paths")
 	.action((baseUrl, options) => generateSitemap(baseUrl, options));
 
 program.parse();
