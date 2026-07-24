@@ -11,6 +11,8 @@ export interface SitemapOptions {
 	project?: string;
 	/** Enabling this flag adds a trailing slash to all paths */
 	trailingSlash?: boolean;
+	/** Paths to exclude from the sitemap */
+	excludedPaths?: string[];
 }
 
 /**
@@ -21,8 +23,9 @@ export interface SitemapOptions {
  * @param baseUrl Absolute base URL of the site
  * @param project Project name in angular.json
  * @param trailingSlash Ensure all URLs end with a trailing slash
+ * @param excludedPaths Paths to exclude from the sitemap
  */
-export async function generateSitemap(baseUrl: string, { project, trailingSlash }: SitemapOptions = {}) {
+export async function generateSitemap(baseUrl: string, { project, trailingSlash, excludedPaths }: SitemapOptions = {}) {
 	if (!project) {
 		const configLocation = path.join(process.cwd(), "angular.json");
 		const config = JSON.parse(await fs.readFile(configLocation, "utf-8"));
@@ -35,12 +38,15 @@ export async function generateSitemap(baseUrl: string, { project, trailingSlash 
 	}
 
 	const lastModified = getCurrentDate();
+	excludedPaths ??= [];
 
 	const prerenderedRoutesPath = path.join(process.cwd(), "dist", project, "prerendered-routes.json");
 	const { routes } = JSON.parse(await fs.readFile(prerenderedRoutesPath, "utf-8"));
 	const root = create({ version: "1.0", encoding: "UTF-8" });
 	const urls = root.ele("urlset").att("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
 	for (const path in routes) {
+		if (excludedPaths.includes(path)) continue;
+
 		const url = handleTrailingSlash(baseUrl + path, trailingSlash);
 		const urlElement = urls.ele("url");
 		urlElement.ele("loc").txt(url);

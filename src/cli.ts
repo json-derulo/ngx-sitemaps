@@ -13,6 +13,7 @@ program
 	.argument("<base-url>", "Absolute base URL of the site")
 	.option("-p, --project <project>", "Project name in angular.json")
 	.option("--trailing-slash", "With this option a trailing slash is added to all paths")
+	.option("-e, --excluded-paths <excluded-paths...>", "Paths to exclude from the sitemap")
 	.action((baseUrl, options) => generateSitemap(baseUrl, options));
 
 program.parse();

@@ -44,3 +44,4 @@ await generateSitemap("https://your-site.com");
 | -------------- | ------------------ | --------------- | ---------------------------------- |
 | Project        | `--project`        | `project`       | Project name in angular.json       |
 | Trailing Slash | `--trailing-slash` | `trailingSlash` | Adds a trailing slash to all paths |
+| Excluded Paths | `--excluded-paths` | `excludedPaths` | Paths to exclude from the sitemap  |
