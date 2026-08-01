@@ -1,6 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { create } from "xmlbuilder2";
+import { loadConfig, matchRoute, matchWildcard } from "./config.js";
+import { getCurrentDate, handleTrailingSlash } from "./utils.js";
 
 /** Options for the sitemap generation. */
 export interface SitemapOptions {
@@ -13,6 +15,8 @@ export interface SitemapOptions {
 	trailingSlash?: boolean;
 	/** Paths to exclude from the sitemap */
 	excludedPaths?: string[];
+	/** Path to sitemap config file */
+	configPath?: string;
 }
 
 /**
@@ -24,8 +28,12 @@ export interface SitemapOptions {
  * @param project Project name in angular.json
  * @param trailingSlash Ensure all URLs end with a trailing slash
  * @param excludedPaths Paths to exclude from the sitemap
+ * @param configPath Path to sitemap config file
  */
-export async function generateSitemap(baseUrl: string, { project, trailingSlash, excludedPaths }: SitemapOptions = {}) {
+export async function generateSitemap(
+	baseUrl: string,
+	{ project, trailingSlash, excludedPaths, configPath }: SitemapOptions = {},
+) {
 	if (!project) {
 		const configLocation = path.join(process.cwd(), "angular.json");
 		const config = JSON.parse(await fs.readFile(configLocation, "utf-8"));
@@ -40,32 +48,28 @@ export async function generateSitemap(baseUrl: string, { project, trailingSlash,
 	const lastModified = getCurrentDate();
 	excludedPaths ??= [];
 
+	const defaultConfigPath = path.join(process.cwd(), "sitemap.config.jsonc");
+	const resolvedConfigPath = configPath ?? defaultConfigPath;
+	const sitemapConfig = await loadConfig(resolvedConfigPath);
+
 	const prerenderedRoutesPath = path.join(process.cwd(), "dist", project, "prerendered-routes.json");
 	const { routes } = JSON.parse(await fs.readFile(prerenderedRoutesPath, "utf-8"));
 	const root = create({ version: "1.0", encoding: "UTF-8" });
 	const urls = root.ele("urlset").att("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
 	for (const path in routes) {
-		if (excludedPaths.includes(path)) continue;
+		if (excludedPaths.some((pattern) => matchWildcard(path, pattern))) continue;
+		if (sitemapConfig?.excludedPaths?.some((pattern) => matchWildcard(path, pattern))) continue;
 
 		const url = handleTrailingSlash(baseUrl + path, trailingSlash);
+		const routeConfig = sitemapConfig ? matchRoute(path, sitemapConfig) : null;
 		const urlElement = urls.ele("url");
 		urlElement.ele("loc").txt(url);
-		urlElement.ele("lastmod").txt(lastModified);
+		urlElement.ele("lastmod").txt(routeConfig?.lastmod ?? lastModified);
+		if (routeConfig?.priority != null) urlElement.ele("priority").txt(String(routeConfig.priority));
+		if (routeConfig?.changefreq) urlElement.ele("changefreq").txt(routeConfig.changefreq);
 	}
 	const xml = root.end({ prettyPrint: true });
 	const outputPath = path.join(process.cwd(), "dist", project, "browser", "sitemap.xml");
 
 	await fs.writeFile(outputPath, xml);
-}
-
-function getCurrentDate(): string {
-	// en-CA uses the YYYY-MM-DD format which the sitemap expects
-	return new Intl.DateTimeFormat("en-CA").format(new Date());
-}
-
-function handleTrailingSlash(url: string, hasTrailingSlash: boolean | undefined): string {
-	if (!hasTrailingSlash || url.endsWith("/")) {
-		return url;
-	}
-	return url + "/";
 }

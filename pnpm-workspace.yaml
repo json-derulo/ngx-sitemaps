@@ -1,1 +1,4 @@
+allowBuilds:
+    esbuild: false
+
 minimumReleaseAge: 10080

@@ -40,8 +40,85 @@ await generateSitemap("https://your-site.com");
 
 ## Options
 
-| Title          | CLI usage          | Direct usage    | Description                        |
-| -------------- | ------------------ | --------------- | ---------------------------------- |
-| Project        | `--project`        | `project`       | Project name in angular.json       |
-| Trailing Slash | `--trailing-slash` | `trailingSlash` | Adds a trailing slash to all paths |
-| Excluded Paths | `--excluded-paths` | `excludedPaths` | Paths to exclude from the sitemap  |
+| Title          | CLI usage          | Direct usage    | Description                                                                   |
+| -------------- | ------------------ | --------------- | ----------------------------------------------------------------------------- |
+| Project        | `--project`        | `project`       | Project name in angular.json                                                  |
+| Trailing Slash | `--trailing-slash` | `trailingSlash` | Adds a trailing slash to all paths                                            |
+| Excluded Paths | `--excluded-paths` | `excludedPaths` | Paths to exclude from the sitemap. Supports wildcard patterns using `**`.     |
+| Config         | `--config [path]`  | `configPath`    | Path to sitemap config file (defaults to `sitemap.config.jsonc` if it exists) |
+
+### Config command options
+
+| Title   | CLI usage         | Description                                                          |
+| ------- | ----------------- | -------------------------------------------------------------------- |
+| Project | `--project`       | Project name in angular.json                                         |
+| Output  | `--output <path>` | Output path for the config file (defaults to `sitemap.config.jsonc`) |
+
+## Per-route customization
+
+The config file is **optional**. Use it only if you want to customize `lastmod`, `priority`, or `changefreq` per route without manually editing the sitemap after each generation.
+
+### 1. Generate the config file
+
+Run the following command to create or update `sitemap.config.jsonc` with all current routes:
+
+```
+npx ngx-sitemaps config
+```
+
+To write the config to a custom path:
+
+```
+npx ngx-sitemaps config --output path/to/sitemap.config.jsonc
+```
+
+This reads your `prerendered-routes.json` and creates a config file like:
+
+```jsonc
+{
+	"$schema": "./node_modules/ngx-sitemaps/sitemap.config.schema.json",
+	"routes": {
+		"/": { "lastmod": null, "priority": null, "changefreq": null },
+		"/blog/post-1": { "lastmod": null, "priority": null, "changefreq": null },
+		"/contact": { "lastmod": null, "priority": null, "changefreq": null },
+	},
+}
+```
+
+Re-running the command will add new routes, preserve existing entries, and remove routes that no longer exist.
+
+### 2. Edit the config file
+
+Fill in the values you want to customize. Use `null` to fall back to the default (today's date for `lastmod`, omitted for `priority`/`changefreq`).
+Wildcard patterns (`**`) are supported and match any route segment. Comments are supported:
+
+```jsonc
+{
+	"$schema": "./node_modules/ngx-sitemaps/sitemap.config.schema.json",
+	// Exclude admin and hidden paths from the sitemap
+	"excludedPaths": ["/admin/**", "/hidden"],
+	"routes": {
+		// Home page
+		"/": { "lastmod": "2025-01-01", "priority": 1.0, "changefreq": "weekly" },
+		// All blog posts
+		"/blog/**": { "lastmod": null, "priority": 0.8, "changefreq": "weekly" },
+		"/contact": { "lastmod": "2025-01-15", "priority": 0.5, "changefreq": "monthly" },
+	},
+}
+```
+
+Specific routes take precedence over wildcard patterns. Paths matching `excludedPaths` are excluded from both the config and the sitemap.
+
+### 3. Generate the sitemap with config
+
+If `sitemap.config.jsonc` exists in the current directory, it is applied automatically:
+
+```
+npx ngx-sitemaps https://your-site.com
+```
+
+To use a custom config file path:
+
+```
+npx ngx-sitemaps https://your-site.com --config path/to/sitemap.config.jsonc
+```
