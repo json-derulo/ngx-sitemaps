@@ -1,0 +1,44 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "ngx-sitemaps configuration",
+	"description": "Configuration file for ngx-sitemaps sitemap generation",
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+		"excludedPaths": {
+			"type": "array",
+			"description": "Paths to exclude from the sitemap. Supports wildcard patterns using **.",
+			"items": {
+				"type": "string",
+				"description": "A path or wildcard pattern (e.g. /admin/**, /hidden)"
+			},
+			"default": []
+		},
+		"routes": {
+			"type": "object",
+			"description": "Per-route customization for lastmod, priority, and changefreq. Keys are route paths or wildcard patterns.",
+			"additionalProperties": {
+				"type": "object",
+				"additionalProperties": false,
+				"properties": {
+					"lastmod": {
+						"type": ["string", "null"],
+						"description": "Last modification date in YYYY-MM-DD format. Use null to fall back to today's date.",
+						"pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+					},
+					"priority": {
+						"type": ["number", "null"],
+						"description": "Priority of this URL relative to other URLs (0.0 to 1.0). Use null to omit.",
+						"minimum": 0,
+						"maximum": 1
+					},
+					"changefreq": {
+						"type": ["string", "null"],
+						"description": "How frequently the page is likely to change. Use null to omit.",
+						"enum": ["always", "hourly", "daily", "weekly", "monthly", "yearly", "never", null]
+					}
+				}
+			}
+		}
+	}
+}
