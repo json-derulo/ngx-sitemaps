@@ -38,7 +38,7 @@
 		"xmlbuilder2": "^4.0.3"
 	},
 	"devDependencies": {
-		"@types/node": "24.13.3",
+		"@types/node": "24.13.4",
 		"@vitest/coverage-v8": "4.1.11",
 		"cpy-cli": "7.0.0",
 		"prettier": "3.9.6",
