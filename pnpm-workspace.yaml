@@ -1,4 +1,4 @@
 allowBuilds:
     esbuild: false
 
-minimumReleaseAge: 10080
+minimumReleaseAge: 4320
