@@ -38,7 +38,7 @@
 		"xmlbuilder2": "^4.0.3"
 	},
 	"devDependencies": {
-		"@types/node": "24.19.2",
+		"@types/node": "26.6.6",
 		"@vitest/coverage-v8": "5.0.5",
 		"cpy-cli": "7.0.0",
 		"oxfmt": "0.75.0",
